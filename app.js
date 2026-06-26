@@ -36,7 +36,7 @@ const warframeRecords = [
   record("Baruuk", "荒野猎手", "martial", 10, "#e6d8ae", [], ["Baruuk Prime", "Doan", "Meroe", "Graxx"]),
   record("Caliban", "卡利班", "sentient", 10, "#b8f0ff", [], ["Caliban Orfeo", "Caliban Cranion", "Caliban Sentient"]),
   record("Chroma", "龙甲", "dragon", 11, "#ff9b5d", [], ["Chroma Prime", "Dynasty", "Graxx", "Thyrus"]),
-  record("Ember", "永恒烈焰", "fire", 11, "#ff7b4d", ["火鸡"], ["Ember Prime", "Pyraxis", "Vermillion", "Graxx"]),
+  record("Ember", "永恒烈焰", "fire", 11, "#ff7b4d", ["火鸡"], ["Ember Prime", "Ember Heirloom", "Pyraxis", "Vermillion", "Graxx"]),
   record("Equinox", "阴阳双子", "duality", 10, "#c9c0ff", ["阴阳"], ["Equinox Prime", "Antonym", "Clisthert", "Megaera"]),
   record("Frost", "冰雪寒霜", "ice", 10, "#a7e7ff", ["冰男"], ["Frost Prime", "Harka", "Zastruga", "Grognak"]),
   record("Gara", "琉璃仕女", "glass", 10, "#c7f7ff", [], ["Gara Prime", "Kaleida", "Zamariu", "Virago"]),
@@ -58,7 +58,7 @@ const warframeRecords = [
   record("Styanax", "斯巴达", "hoplite", 10, "#89b6ff", [], ["Styanax Tonatiuh", "Styanax Gerousic", "Styanax Agogean"]),
   record("Titania", "蝶甲", "pixie", 10, "#ffa7d2", [], ["Titania Prime", "Empress", "Mab", "Unseelie"]),
   record("Trinity", "三位一体", "healer", 10, "#e8f1ff", ["奶妈"], ["Trinity Prime", "Strega", "Knightess", "Gersemi"]),
-  record("Valkyr", "瓦尔基里", "berserker", 10, "#ff8c83", ["猫女"], ["Valkyr Prime", "Gersemi", "Carnivex", "Leonessa"]),
+  record("Valkyr", "瓦尔基里", "berserker", 10, "#ff8c83", ["猫女"], ["Valkyr Prime", "Valkyr Heirloom", "Gersemi", "Carnivex", "Leonessa"]),
   record("Vauban", "工程统帅", "engineer", 10, "#9dd8ff", [], ["Vauban Prime", "Citadel", "Graxx", "Suppa"]),
   record("Wukong", "齐天大圣", "trickster", 12, "#ffd36a", ["猴子"], ["Wukong Prime", "Samadhi", "Macak", "Xingzhe"]),
   record("Zephyr", "狂啸西风", "air", 10, "#9ee7ff", ["鸟姐"], ["Zephyr Prime", "Harrier", "Hagoromo", "Strafe"])
@@ -421,6 +421,8 @@ let warpTunnel = null;
 let warpFlash = null;
 let controlsCollapsed = false;
 let detailCollapsed = false;
+let clickCandidate = null;
+const activePointers = new Set();
 
 const els = {
   objectList: document.querySelector("#objectList"),
@@ -1712,13 +1714,53 @@ function clearGroup(group) {
 }
 
 function onPointerDown(event) {
+  activePointers.add(event.pointerId);
+  clickCandidate = null;
   if (event.target.closest("button, input, .panel")) return;
+  if (activePointers.size > 1) return;
+
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
   const intersects = raycaster.intersectObjects(clickable, true);
   const hit = intersects.find((entry) => entry.object.userData.item);
-  if (hit) selectObject(hit.object);
+  if (!hit) return;
+
+  clickCandidate = {
+    object: hit.object,
+    pointerId: event.pointerId,
+    pointerType: event.pointerType,
+    x: event.clientX,
+    y: event.clientY,
+    startedAt: performance.now(),
+    moved: false
+  };
+}
+
+function onPointerMove(event) {
+  if (!clickCandidate || clickCandidate.pointerId !== event.pointerId) return;
+  const distance = Math.hypot(event.clientX - clickCandidate.x, event.clientY - clickCandidate.y);
+  if (distance > 8) clickCandidate.moved = true;
+}
+
+function onPointerUp(event) {
+  const wasMultiTouch = activePointers.size > 1;
+  activePointers.delete(event.pointerId);
+  if (!clickCandidate || clickCandidate.pointerId !== event.pointerId) return;
+
+  const candidate = clickCandidate;
+  clickCandidate = null;
+  const duration = performance.now() - candidate.startedAt;
+  const distance = Math.hypot(event.clientX - candidate.x, event.clientY - candidate.y);
+  const maxDuration = candidate.pointerType === "mouse" ? 280 : 330;
+  if (wasMultiTouch || candidate.moved || distance > 8 || duration > maxDuration) return;
+
+  selectObject(candidate.object);
+}
+
+function onPointerCancel(event) {
+  activePointers.delete(event.pointerId);
+  if (clickCandidate?.pointerId === event.pointerId) clickCandidate = null;
 }
 
 function onWheel(event) {
@@ -2091,6 +2133,13 @@ els.cinemaMode.addEventListener("click", () => {
 });
 
 window.addEventListener("pointerdown", onPointerDown);
+window.addEventListener("pointermove", onPointerMove);
+window.addEventListener("pointerup", onPointerUp);
+window.addEventListener("pointercancel", onPointerCancel);
+window.addEventListener("blur", () => {
+  activePointers.clear();
+  clickCandidate = null;
+});
 window.addEventListener("wheel", onWheel, { passive: false, capture: true });
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
