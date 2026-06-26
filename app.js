@@ -1485,6 +1485,7 @@ function renderList() {
 
 function updateDetail(nodeData) {
   resetDetailMedia();
+  document.body.classList.toggle("has-selection", Boolean(nodeData));
   if (!nodeData) {
     els.detailType.textContent = activeGalaxy === "warframes" ? "WARFRAME GALAXY" : "WEAPON GALAXY";
     els.detailName.textContent = activeGalaxy === "warframes" ? "战甲星系" : "武器星系";
