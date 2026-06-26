@@ -23,61 +23,73 @@
       </section>
 
       <aside class="panel panel-left" aria-label="星图控制">
-        <div class="search-row">
-          <input id="searchInput" type="search" placeholder="搜索 圣枪弥撒 / 灰烬之刃 / Mesa" autocomplete="off" />
-          <button id="resetView" title="重置视角" aria-label="重置视角">↻</button>
+        <div class="mobile-panel-bar">
+          <strong id="mobileControlTitle">探索</strong>
+          <button id="toggleControls" type="button" aria-label="收起搜索面板">收起</button>
         </div>
 
-        <div class="segmented" role="tablist" aria-label="星系选择">
-          <button class="active" data-galaxy="warframes">战甲星系</button>
-          <button data-galaxy="weapons">武器星系</button>
-        </div>
+        <div class="panel-left-body">
+          <div class="search-row">
+            <input id="searchInput" type="search" placeholder="搜索 圣枪弥撒 / 灰烬之刃 / Mesa" autocomplete="off" />
+            <button id="resetView" title="重置视角" aria-label="重置视角">↻</button>
+          </div>
 
-        <div class="filters" aria-label="分类筛选">
-          <button class="active" data-filter="all">全部</button>
-          <button data-filter="prime">Prime</button>
-          <button data-filter="deluxe">Deluxe</button>
-          <button data-filter="heirloom">Heirloom</button>
-          <button data-filter="tennogen">TennoGen</button>
-          <button data-filter="incarnon">Incarnon</button>
-        </div>
+          <div class="segmented" role="tablist" aria-label="星系选择">
+            <button class="active" data-galaxy="warframes">战甲星系</button>
+            <button data-galaxy="weapons">武器星系</button>
+          </div>
 
-        <div class="data-audit" id="dataAudit" aria-label="资料完整度"></div>
-        <div class="list" id="objectList"></div>
+          <div class="filters" aria-label="分类筛选">
+            <button class="active" data-filter="all">全部</button>
+            <button data-filter="prime">Prime</button>
+            <button data-filter="deluxe">Deluxe</button>
+            <button data-filter="heirloom">Heirloom</button>
+            <button data-filter="tennogen">TennoGen</button>
+            <button data-filter="incarnon">Incarnon</button>
+          </div>
+
+          <div class="data-audit" id="dataAudit" aria-label="资料完整度"></div>
+          <div class="list" id="objectList"></div>
+        </div>
       </aside>
 
       <aside class="panel panel-right" aria-live="polite">
-        <p class="eyebrow" id="detailType">SELECTED NODE</p>
-        <h2 id="detailName">点击一颗恒星</h2>
-        <div class="detail-media" id="detailMedia" hidden>
-          <img id="detailImage" alt="" loading="eager" referrerpolicy="no-referrer" />
-          <div class="detail-media-fallback" id="detailMediaFallback">
-            <span id="detailFallbackMark">M</span>
-            <small>星图材质预览</small>
-          </div>
-          <span class="detail-status" id="detailStatus">待核对</span>
+        <div class="detail-head">
+          <p class="eyebrow" id="detailType">SELECTED NODE</p>
+          <button id="toggleDetail" type="button" aria-label="收起详情">收起</button>
         </div>
-        <p id="detailCopy">恒星代表战甲或武器，行星代表皮肤、变体和特殊外观。拖动星图，点击节点进入它的轨道。</p>
-        <dl class="detail-grid">
-          <div>
-            <dt>分类</dt>
-            <dd id="detailCategory">-</dd>
+        <h2 id="detailName">点击一颗恒星</h2>
+        <div class="detail-body">
+          <div class="detail-media" id="detailMedia" hidden>
+            <img id="detailImage" alt="" loading="eager" referrerpolicy="no-referrer" />
+            <div class="detail-media-fallback" id="detailMediaFallback">
+              <span id="detailFallbackMark">M</span>
+              <small>星图材质预览</small>
+            </div>
+            <span class="detail-status" id="detailStatus">待核对</span>
           </div>
-          <div>
-            <dt>轨道数量</dt>
-            <dd id="detailChildren">-</dd>
-          </div>
-          <div>
-            <dt>视觉权重</dt>
-            <dd id="detailWeight">-</dd>
-          </div>
-        </dl>
-        <dl class="detail-facts" id="detailFacts" hidden>
-          <div><dt>发布时间</dt><dd id="detailRelease">-</dd></div>
-          <div><dt>获取方式</dt><dd id="detailAcquisition">-</dd></div>
-        </dl>
-        <a class="detail-source" id="detailSource" href="#" target="_blank" rel="noreferrer" hidden>查看公共资料页 →</a>
-        <div class="detail-tags" id="detailTags"></div>
+          <p id="detailCopy">恒星代表战甲或武器，行星代表皮肤、变体和特殊外观。拖动星图，点击节点进入它的轨道。</p>
+          <dl class="detail-grid">
+            <div>
+              <dt>分类</dt>
+              <dd id="detailCategory">-</dd>
+            </div>
+            <div>
+              <dt>轨道数量</dt>
+              <dd id="detailChildren">-</dd>
+            </div>
+            <div>
+              <dt>视觉权重</dt>
+              <dd id="detailWeight">-</dd>
+            </div>
+          </dl>
+          <dl class="detail-facts" id="detailFacts" hidden>
+            <div><dt>发布时间</dt><dd id="detailRelease">-</dd></div>
+            <div><dt>获取方式</dt><dd id="detailAcquisition">-</dd></div>
+          </dl>
+          <a class="detail-source" id="detailSource" href="#" target="_blank" rel="noreferrer" hidden>查看公共资料页 →</a>
+          <div class="detail-tags" id="detailTags"></div>
+        </div>
       </aside>
 
       <div class="cinema">

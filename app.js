@@ -58,7 +58,7 @@ const warframeRecords = [
   record("Styanax", "斯巴达", "hoplite", 10, "#89b6ff", [], ["Styanax Tonatiuh", "Styanax Gerousic", "Styanax Agogean"]),
   record("Titania", "蝶甲", "pixie", 10, "#ffa7d2", [], ["Titania Prime", "Empress", "Mab", "Unseelie"]),
   record("Trinity", "三位一体", "healer", 10, "#e8f1ff", ["奶妈"], ["Trinity Prime", "Strega", "Knightess", "Gersemi"]),
-  record("Valkyr", "狂啸西风", "berserker", 10, "#ff8c83", ["猫女"], ["Valkyr Prime", "Gersemi", "Carnivex", "Leonessa"]),
+  record("Valkyr", "瓦尔基里", "berserker", 10, "#ff8c83", ["猫女"], ["Valkyr Prime", "Gersemi", "Carnivex", "Leonessa"]),
   record("Vauban", "工程统帅", "engineer", 10, "#9dd8ff", [], ["Vauban Prime", "Citadel", "Graxx", "Suppa"]),
   record("Wukong", "齐天大圣", "trickster", 12, "#ffd36a", ["猴子"], ["Wukong Prime", "Samadhi", "Macak", "Xingzhe"]),
   record("Zephyr", "狂啸西风", "air", 10, "#9ee7ff", ["鸟姐"], ["Zephyr Prime", "Harrier", "Hagoromo", "Strafe"])
@@ -419,6 +419,8 @@ let galaxyTransition = null;
 let warpField = null;
 let warpTunnel = null;
 let warpFlash = null;
+let controlsCollapsed = false;
+let detailCollapsed = false;
 
 const els = {
   objectList: document.querySelector("#objectList"),
@@ -439,6 +441,9 @@ const els = {
   detailMediaFallback: document.querySelector("#detailMediaFallback"),
   detailFallbackMark: document.querySelector("#detailFallbackMark"),
   detailStatus: document.querySelector("#detailStatus"),
+  toggleControls: document.querySelector("#toggleControls"),
+  toggleDetail: document.querySelector("#toggleDetail"),
+  mobileControlTitle: document.querySelector("#mobileControlTitle"),
   detailFacts: document.querySelector("#detailFacts"),
   detailRelease: document.querySelector("#detailRelease"),
   detailAcquisition: document.querySelector("#detailAcquisition"),
@@ -454,6 +459,33 @@ els.skinCount.textContent = warframes.reduce((sum, item) => sum + item.children.
 els.weaponCount.textContent = weapons.length;
 els.searchInput.placeholder = "搜索 圣枪弥撒 / 灰烬之刃 / Mesa";
 renderDataAudit();
+
+function setControlsCollapsed(collapsed) {
+  controlsCollapsed = collapsed;
+  document.body.classList.toggle("controls-collapsed", collapsed);
+  if (els.toggleControls) {
+    els.toggleControls.textContent = collapsed ? "展开" : "收起";
+    els.toggleControls.setAttribute("aria-label", collapsed ? "展开搜索面板" : "收起搜索面板");
+  }
+}
+
+function setDetailCollapsed(collapsed) {
+  detailCollapsed = collapsed;
+  document.body.classList.toggle("detail-collapsed", collapsed);
+  if (els.toggleDetail) {
+    els.toggleDetail.textContent = collapsed ? "展开" : "收起";
+    els.toggleDetail.setAttribute("aria-label", collapsed ? "展开详情" : "收起详情");
+  }
+}
+
+function updateMobileControlTitle() {
+  if (!els.mobileControlTitle) return;
+  if (focusedSystem) {
+    els.mobileControlTitle.textContent = `${formatName(focusedSystem.userData.item.name)} 轨道`;
+  } else {
+    els.mobileControlTitle.textContent = activeGalaxy === "warframes" ? "战甲星系" : "武器星系";
+  }
+}
 
 const flareTexture = createRadialTexture(["rgba(255,255,255,1)", "rgba(180,220,255,0.42)", "rgba(80,140,255,0)"]);
 const dustTexture = createRadialTexture(["rgba(255,255,255,0.75)", "rgba(170,210,255,0.16)", "rgba(255,255,255,0)"]);
@@ -1448,6 +1480,7 @@ function categoryMatch(name, filter) {
 
 function renderList() {
   els.objectList.innerHTML = "";
+  updateMobileControlTitle();
 
   if (focusedSystem) {
     const parent = focusedSystem.userData.item;
@@ -1458,7 +1491,15 @@ function renderList() {
 
     const context = document.createElement("div");
     context.className = "list-context";
-    context.innerHTML = `<strong>${formatName(parent.name)}</strong><span>${orbitals.length} 个皮肤行星</span>`;
+    context.innerHTML = `
+      <div><strong>${formatName(parent.name)}</strong><span>${orbitals.length} 个皮肤行星</span></div>
+      <div class="list-context-actions">
+        <button type="button" data-list-action="overview">返回列表</button>
+        <button type="button" data-list-action="reset">总星图</button>
+      </div>
+    `;
+    context.querySelector('[data-list-action="overview"]').addEventListener("click", leaveFocusedSystem);
+    context.querySelector('[data-list-action="reset"]').addEventListener("click", resetCamera);
     els.objectList.appendChild(context);
 
     orbitals.forEach((name) => {
@@ -1617,6 +1658,20 @@ function focusByName(name) {
   selectObject(hit);
 }
 
+function leaveFocusedSystem() {
+  if (focusedSystem) setSystemPlanetDetail(focusedSystem, false);
+  focusedSystem = null;
+  selected = null;
+  els.systemExit.classList.remove("visible");
+  controls.minDistance = 24;
+  controls.autoRotate = true;
+  targetCamera = new THREE.Vector3(0, 42, 98);
+  targetLook = new THREE.Vector3(0, 0, 0);
+  zoomDistance = null;
+  renderList();
+  updateDetail(null);
+}
+
 function selectObject(object) {
   const data = object.userData.item;
   selected = object;
@@ -1627,6 +1682,8 @@ function selectObject(object) {
   els.systemExit.classList.add("visible");
   renderList();
   updateDetail(data);
+  setDetailCollapsed(false);
+  if (window.matchMedia("(max-width: 820px)").matches) setControlsCollapsed(true);
   const world = new THREE.Vector3();
   object.getWorldPosition(world);
   targetLook = world.clone();
@@ -1982,6 +2039,8 @@ function resetCamera() {
   controls.autoRotate = true;
   zoomDistance = null;
   els.searchInput.value = "";
+  setControlsCollapsed(false);
+  setDetailCollapsed(false);
   renderList();
   updateDetail(null);
 }
@@ -1991,6 +2050,8 @@ document.querySelectorAll("[data-galaxy]").forEach((button) => {
     document.querySelectorAll("[data-galaxy]").forEach((item) => item.classList.remove("active"));
     button.classList.add("active");
     els.searchInput.value = "";
+    setControlsCollapsed(false);
+    setDetailCollapsed(false);
     beginGalaxyTransition(button.dataset.galaxy);
   });
 });
@@ -2021,6 +2082,8 @@ els.searchInput.addEventListener("input", () => {
 
 els.resetView.addEventListener("click", resetCamera);
 els.exitSystem.addEventListener("click", resetCamera);
+els.toggleControls?.addEventListener("click", () => setControlsCollapsed(!controlsCollapsed));
+els.toggleDetail?.addEventListener("click", () => setDetailCollapsed(!detailCollapsed));
 els.cinemaMode.addEventListener("click", () => {
   cinema = !cinema;
   controls.autoRotate = !cinema;
