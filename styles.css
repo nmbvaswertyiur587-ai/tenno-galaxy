@@ -218,6 +218,60 @@ button:active {
   font-size: 12px;
 }
 
+.data-audit {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid rgba(127, 255, 193, 0.17);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(127, 255, 193, 0.08), rgba(117, 199, 255, 0.045)),
+    rgba(255, 255, 255, 0.035);
+}
+
+.audit-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.audit-title strong {
+  color: #baffdc;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.audit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.audit-grid span {
+  min-width: 0;
+  padding: 7px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.16);
+  font-size: 11px;
+}
+
+.audit-grid b {
+  color: var(--text);
+  margin-right: 4px;
+}
+
+.data-audit p {
+  margin-top: 8px;
+  color: #aab8ca;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
 .segmented .active,
 .filters .active {
   color: var(--text);

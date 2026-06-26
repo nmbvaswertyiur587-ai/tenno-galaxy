@@ -24,8 +24,8 @@
 
       <aside class="panel panel-left" aria-label="星图控制">
         <div class="search-row">
-          <input id="searchInput" type="search" placeholder="搜索 Mesa / Jade / Skana" autocomplete="off" />
-          <button id="resetView" title="重置视角" aria-label="重置视角">⌖</button>
+          <input id="searchInput" type="search" placeholder="搜索 圣枪弥撒 / 灰烬之刃 / Mesa" autocomplete="off" />
+          <button id="resetView" title="重置视角" aria-label="重置视角">↻</button>
         </div>
 
         <div class="segmented" role="tablist" aria-label="星系选择">
@@ -42,6 +42,7 @@
           <button data-filter="incarnon">Incarnon</button>
         </div>
 
+        <div class="data-audit" id="dataAudit" aria-label="资料完整度"></div>
         <div class="list" id="objectList"></div>
       </aside>
 
@@ -54,7 +55,7 @@
             <span id="detailFallbackMark">M</span>
             <small>星图材质预览</small>
           </div>
-          <span class="detail-status" id="detailStatus">待核实</span>
+          <span class="detail-status" id="detailStatus">待核对</span>
         </div>
         <p id="detailCopy">恒星代表战甲或武器，行星代表皮肤、变体和特殊外观。拖动星图，点击节点进入它的轨道。</p>
         <dl class="detail-grid">
@@ -75,7 +76,7 @@
           <div><dt>发布时间</dt><dd id="detailRelease">-</dd></div>
           <div><dt>获取方式</dt><dd id="detailAcquisition">-</dd></div>
         </dl>
-        <a class="detail-source" id="detailSource" href="#" target="_blank" rel="noreferrer" hidden>查看公共资料页 ↗</a>
+        <a class="detail-source" id="detailSource" href="#" target="_blank" rel="noreferrer" hidden>查看公共资料页 →</a>
         <div class="detail-tags" id="detailTags"></div>
       </aside>
 

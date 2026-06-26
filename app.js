@@ -5,33 +5,66 @@ import { RenderPass } from "https://esm.sh/three@0.165.0/examples/jsm/postproces
 import { UnrealBloomPass } from "https://esm.sh/three@0.165.0/examples/jsm/postprocessing/UnrealBloomPass.js";
 import { ShaderPass } from "https://esm.sh/three@0.165.0/examples/jsm/postprocessing/ShaderPass.js";
 
-const warframes = [
-  node("Excalibur", "starter", 10, "#dfe9ff", ["Excalibur Prime", "Excalibur Umbra", "Dex Excalibur", "Proto-Armor", "Zato"]),
-  node("Ash", "assassin", 10, "#aeb8c8", ["Ash Prime", "Koga", "Shroud", "Bai Hu"]),
-  node("Mag", "starter", 8, "#75c7ff", ["Mag Prime", "Pneuma", "Alata", "Ferro", "Induction"]),
-  node("Volt", "starter", 9, "#8fd7ff", ["Volt Prime", "Proto Volt", "Amp", "Graxx", "Electrolyst"]),
-  node("Rhino", "tank", 12, "#f2c76d", ["Rhino Prime", "Palatine", "Deathwatch", "Rubedo Plated", "Vojnik"]),
-  node("Mesa", "gunslinger", 15, "#ffc85a", ["Mesa Prime", "Mesa Heirloom", "Presidio", "Projectilyst", "Graxx"]),
-  node("Jade", "support", 11, "#7fffc1", ["Jade Aureolt", "Jade Ophanim", "Jade Chorus", "Jade Canticle"]),
-  node("Wisp", "support", 14, "#9a8cff", ["Wisp Prime", "Wisp Dex", "Gaoth", "Delusion", "Somnium"]),
-  node("Gauss", "speed", 12, "#75c7ff", ["Gauss Prime", "Agito", "Kresnik", "Graxx"]),
-  node("Protea", "engineer", 12, "#ff9d6e", ["Protea Prime", "Caladrius", "Technocron", "Mavv"]),
-  node("Saryn", "nuke", 13, "#93f18a", ["Saryn Prime", "Orphid", "Napellus", "Integra", "Blade of the Lotus"]),
-  node("Nova", "control", 11, "#d58cff", ["Nova Prime", "Atomica", "Asuri", "Visage", "Corpra"]),
-  node("Nidus", "infested", 10, "#b5de74", ["Nidus Prime", "Phryke", "Technocyst", "Nighthunter"]),
-  node("Harrow", "ritual", 10, "#d8d4c8", ["Harrow Prime", "Reliquary", "Crucis", "Hieropha"]),
-  node("Khora", "hunter", 11, "#ff7fa8", ["Khora Prime", "Miyabi", "Urushu", "Fiera"]),
-  node("Revenant", "eidolon", 12, "#7df7d7", ["Revenant Prime", "Mephisto", "Wight", "Immortuos"]),
-  node("Dante", "scribe", 10, "#c9b8ff", ["Dante Cantist", "Dante Noctua", "Dante Chronicler"]),
-  node("Dagath", "specter", 9, "#7db5ff", ["Dagath Ganceann", "Dagath Dullahan", "Dagath Wraith"]),
-  node("Kullervo", "duviri", 10, "#ff6969", ["Kullervo Usvah", "Kullervo Ahlto", "Kullervo Thorn"]),
-  node("Voruna", "wolf", 10, "#8fa0ff", ["Voruna Anukas", "Voruna Voidshell", "Voruna Raksh"]),
-  node("Lavos", "alchemist", 9, "#f0a35d", ["Lavos Kuvael", "Lavos Yersin", "Lavos Cordatus"]),
-  node("Sevagoth", "void", 11, "#8aa0ff", ["Sevagoth Prime", "Glaukus", "Lucifuge", "Liminus"]),
-  node("Xaku", "void", 12, "#ebe3c4", ["Xaku Prime", "Kintsu", "Dehiscence", "Avarice"]),
-  node("Yareli", "k-drive", 9, "#70dfff", ["Yareli Pandea", "Yareli Physalia", "Yareli Calamari"]),
-  node("Citrine", "crystal", 10, "#ff8ac8", ["Citrine Kalite", "Citrine Auralyst", "Citrine Geode"])
+const warframeRecords = [
+  record("Excalibur", "圣剑", "starter", 10, "#dfe9ff", ["咖喱", "圣剑哥"], ["Excalibur Prime", "Excalibur Umbra", "Dex Excalibur", "Proto-Armor", "Zato"]),
+  record("Ash", "灰烬之刃", "assassin", 10, "#aeb8c8", ["灰烬", "忍者甲"], ["Ash Prime", "Koga", "Shroud", "Bai Hu"]),
+  record("Mag", "磁力", "starter", 8, "#75c7ff", ["磁妹"], ["Mag Prime", "Pneuma", "Alata", "Ferro", "Induction"]),
+  record("Volt", "伏特", "starter", 9, "#8fd7ff", ["电男"], ["Volt Prime", "Proto Volt", "Amp", "Graxx", "Electrolyst"]),
+  record("Rhino", "犀牛", "tank", 12, "#f2c76d", ["牛", "牛甲"], ["Rhino Prime", "Palatine", "Deathwatch", "Rubedo Plated", "Vojnik"]),
+  record("Mesa", "圣枪弥撒", "gunslinger", 15, "#ffc85a", ["圣枪", "梅萨", "女枪"], ["Mesa Prime", "Mesa Heirloom", "Presidio", "Projectilyst", "Graxx"]),
+  record("Jade", "翡翠", "support", 11, "#7fffc1", [], ["Jade Aureolt", "Jade Ophanim", "Jade Chorus", "Jade Canticle"]),
+  record("Wisp", "幽灵", "support", 14, "#9a8cff", ["花妈"], ["Wisp Prime", "Wisp Dex", "Gaoth", "Delusion", "Somnium"]),
+  record("Gauss", "高斯", "speed", 12, "#75c7ff", ["跑男"], ["Gauss Prime", "Agito", "Kresnik", "Graxx", "Altra"]),
+  record("Protea", "普洛蒂亚", "engineer", 12, "#ff9d6e", ["工程妹"], ["Protea Prime", "Caladrius", "Technocron", "Mavv"]),
+  record("Saryn", "萨琳", "nuke", 13, "#93f18a", ["毒妈"], ["Saryn Prime", "Orphid", "Napellus", "Integra", "Blade of the Lotus"]),
+  record("Nova", "诺娃", "control", 11, "#d58cff", ["加速娃"], ["Nova Prime", "Atomica", "Asuri", "Visage", "Corpra"]),
+  record("Nidus", "奈德斯", "infested", 10, "#b5de74", ["蛆甲"], ["Nidus Prime", "Phryke", "Technocyst", "Nighthunter"]),
+  record("Harrow", "驱魔使者", "ritual", 10, "#d8d4c8", ["主教"], ["Harrow Prime", "Reliquary", "Crucis", "Hieropha"]),
+  record("Khora", "克拉", "hunter", 11, "#ff7fa8", ["猫甲"], ["Khora Prime", "Miyabi", "Urushu", "Fiera"]),
+  record("Revenant", "夜灵", "eidolon", 12, "#7df7d7", ["夜灵甲"], ["Revenant Prime", "Mephisto", "Wight", "Immortuos"]),
+  record("Dante", "但丁", "scribe", 10, "#c9b8ff", [], ["Dante Cantist", "Dante Noctua", "Dante Chronicler"]),
+  record("Dagath", "达伽特", "specter", 9, "#7db5ff", [], ["Dagath Ganceann", "Dagath Dullahan", "Dagath Wraith"]),
+  record("Kullervo", "库勒沃", "duviri", 10, "#ff6969", [], ["Kullervo Usvah", "Kullervo Ahlto", "Kullervo Thorn"]),
+  record("Voruna", "沃鲁娜", "hunter", 10, "#8fa0ff", [], ["Voruna Anukas", "Voruna Voidshell", "Voruna Raksh"]),
+  record("Lavos", "拉沃斯", "alchemist", 9, "#f0a35d", [], ["Lavos Kuvael", "Lavos Yersin", "Lavos Cordatus"]),
+  record("Sevagoth", "赛瓦格斯", "void", 11, "#8aa0ff", [], ["Sevagoth Prime", "Glaukus", "Lucifuge", "Liminus"]),
+  record("Xaku", "扎库", "void", 12, "#ebe3c4", ["骨架"], ["Xaku Prime", "Kintsu", "Dehiscence", "Avarice"]),
+  record("Yareli", "夜灵鲛姬", "k-drive", 9, "#70dfff", ["水妹"], ["Yareli Pandea", "Yareli Physalia", "Yareli Calamari"]),
+  record("Citrine", "柠晶", "crystal", 10, "#ff8ac8", ["水晶"], ["Citrine Kalite", "Citrine Auralyst", "Citrine Geode"]),
+  record("Atlas", "撼天刑者", "brawler", 10, "#d7b170", ["土甲"], ["Atlas Prime", "Karst", "Telamon", "Graxx"]),
+  record("Banshee", "女妖", "sonic", 9, "#94d7ff", [], ["Banshee Prime", "Soprana", "Sonority", "Echo"]),
+  record("Baruuk", "荒野猎手", "martial", 10, "#e6d8ae", [], ["Baruuk Prime", "Doan", "Meroe", "Graxx"]),
+  record("Caliban", "卡利班", "sentient", 10, "#b8f0ff", [], ["Caliban Orfeo", "Caliban Cranion", "Caliban Sentient"]),
+  record("Chroma", "龙甲", "dragon", 11, "#ff9b5d", [], ["Chroma Prime", "Dynasty", "Graxx", "Thyrus"]),
+  record("Ember", "永恒烈焰", "fire", 11, "#ff7b4d", ["火鸡"], ["Ember Prime", "Pyraxis", "Vermillion", "Graxx"]),
+  record("Equinox", "阴阳双子", "duality", 10, "#c9c0ff", ["阴阳"], ["Equinox Prime", "Antonym", "Clisthert", "Megaera"]),
+  record("Frost", "冰雪寒霜", "ice", 10, "#a7e7ff", ["冰男"], ["Frost Prime", "Harka", "Zastruga", "Grognak"]),
+  record("Gara", "琉璃仕女", "glass", 10, "#c7f7ff", [], ["Gara Prime", "Kaleida", "Zamariu", "Virago"]),
+  record("Garuda", "迦楼罗", "gore", 10, "#ff5f75", [], ["Garuda Prime", "Hinsa", "Successor", "Bathory"]),
+  record("Grendel", "暴食", "tank", 10, "#b6d474", [], ["Grendel Prime", "Nian", "Glutt", "Moloch"]),
+  record("Gyre", "旋涡", "electric", 10, "#72f0ff", [], ["Gyre Automaton", "Gyre Kuvael", "Gyre Rotorswell"]),
+  record("Hildryn", "希尔德琳", "shield", 10, "#8fe0ff", [], ["Hildryn Prime", "Sigrun", "Asuron", "Einheri"]),
+  record("Hydroid", "惊涛骇浪", "water", 10, "#66b7ff", ["水男"], ["Hydroid Prime", "Rakkam", "Triton", "Poseidon"]),
+  record("Ivara", "吟游猎手", "hunter", 10, "#9bffce", [], ["Ivara Prime", "Skathi", "Youkai", "Zirastra"]),
+  record("Limbo", "灵薄狱", "rift", 10, "#7d8fff", [], ["Limbo Prime", "Limina", "Vistyx", "Graxx"]),
+  record("Loki", "洛基", "trickster", 10, "#b6ff9d", [], ["Loki Prime", "Knave", "Incubus", "Erebus"]),
+  record("Mirage", "幻影装置", "illusion", 10, "#ffd27a", [], ["Mirage Prime", "Oneiro", "Trivelin", "Joli"]),
+  record("Nekros", "亡灵梦魇", "necromancer", 11, "#b8d0cc", [], ["Nekros Prime", "Irkalla", "Lazarus", "Graxx"]),
+  record("Nezha", "哪吒", "firewalker", 10, "#ffae73", [], ["Nezha Prime", "Empyrean", "Yaksha", "Jinza"]),
+  record("Nyx", "灵化", "psychic", 9, "#b89cff", [], ["Nyx Prime", "Pasithea", "Nemesis", "Aurelia"]),
+  record("Oberon", "圣骑士", "paladin", 10, "#b8f189", [], ["Oberon Prime", "Feyarch", "Blade of the Lotus", "Destrier"]),
+  record("Octavia", "音乐甲", "music", 10, "#da8cff", ["音乐妹"], ["Octavia Prime", "Diva", "Maestra", "Youkai"]),
+  record("Qorvex", "科维克斯", "concrete", 10, "#f0c886", [], ["Qorvex Raxpart", "Qorvex Muridae", "Qorvex Crucible"]),
+  record("Styanax", "斯巴达", "hoplite", 10, "#89b6ff", [], ["Styanax Tonatiuh", "Styanax Gerousic", "Styanax Agogean"]),
+  record("Titania", "蝶甲", "pixie", 10, "#ffa7d2", [], ["Titania Prime", "Empress", "Mab", "Unseelie"]),
+  record("Trinity", "三位一体", "healer", 10, "#e8f1ff", ["奶妈"], ["Trinity Prime", "Strega", "Knightess", "Gersemi"]),
+  record("Valkyr", "狂啸西风", "berserker", 10, "#ff8c83", ["猫女"], ["Valkyr Prime", "Gersemi", "Carnivex", "Leonessa"]),
+  record("Vauban", "工程统帅", "engineer", 10, "#9dd8ff", [], ["Vauban Prime", "Citadel", "Graxx", "Suppa"]),
+  record("Wukong", "齐天大圣", "trickster", 12, "#ffd36a", ["猴子"], ["Wukong Prime", "Samadhi", "Macak", "Xingzhe"]),
+  record("Zephyr", "狂啸西风", "air", 10, "#9ee7ff", ["鸟姐"], ["Zephyr Prime", "Harrier", "Hagoromo", "Strafe"])
 ];
+
+const warframes = warframeRecords.map(toNode);
 
 const weapons = [
   node("Skana", "melee", 8, "#dfe9ff", ["Skana Prime", "Prisma Skana", "Mordred Skin", "Day of the Dead"]),
@@ -141,8 +174,94 @@ const variantTranslations = {
   Kuva: "赤毒", Tenet: "信条", Prisma: "棱晶", Dex: "周年庆", Umbra: "暗影"
 };
 
-function node(name, category, weight, color, children) {
-  return { name, category, weight, color, children };
+Object.assign(nameTranslations, Object.fromEntries(warframeRecords.map((item) => [item.name, item.cn]).filter(([, cn]) => cn)));
+Object.assign(nameAliases, Object.fromEntries(warframeRecords.map((item) => [item.name, item.aliases]).filter(([, aliases]) => aliases.length)));
+Object.assign(categoryAcquisition, {
+  prime: "虚空遗物轮换 / Prime Resurgence",
+  deluxe: "游戏内商城 / 对应豪华组合包",
+  heirloom: "以官方公告与游戏内商城为准",
+  tennogen: "对应平台 TennoGen 商店",
+  incarnon: "钢铁之路轮换 / 对应灵化系统",
+  variant: "以游戏内具体物品说明为准"
+});
+Object.assign(detailCatalog, {
+  "Mesa/Mesa Prime": {
+    status: "公共资料已核对",
+    verified: true,
+    release: "2018-12-18（国际服）",
+    acquisition: "虚空遗物轮换 / Prime Resurgence",
+    copy: "Mesa Prime 是圣枪弥撒的 Prime 变体。这里优先展示可追溯的公共资料，具体轮换仍以游戏内与官方公告为准。",
+    image: "https://wiki.warframe.com/w/Special:Redirect/file/MesaPrime.png",
+    source: "https://wiki.warframe.com/w/Mesa_Prime"
+  },
+  "Mesa/Mesa Heirloom": {
+    status: "待官方复核",
+    verified: false,
+    release: "待录入可靠日期",
+    acquisition: "以官方公告与游戏内商城为准",
+    copy: "该节点先保留为星图概念样板。没有核对到稳定官方资料前，不把传闻或推测写成正式信息。",
+    image: "",
+    source: ""
+  },
+  "Mesa/Presidio": {
+    status: "公共资料已核对",
+    verified: true,
+    release: "豪华外观",
+    acquisition: "游戏内商城 / 对应豪华组合包",
+    copy: "Presidio 是圣枪弥撒的豪华外观节点，详情卡保留素材来源与获取类型，方便后续接入国服名称和商城状态。",
+    image: "https://wiki.warframe.com/w/Special:Redirect/file/MesaPresidioSkin.png",
+    source: "https://wiki.warframe.com/w/Mesa_Presidio_Skin"
+  },
+  "Mesa/Projectilyst": {
+    status: "公共资料已核对",
+    verified: true,
+    release: "TennoGen 外观",
+    acquisition: "对应平台 TennoGen 商店",
+    copy: "Projectilyst 是社区创作者制作的 TennoGen 外观。可用性与价格会因平台和地区不同而变化。",
+    image: "https://wiki.warframe.com/w/Special:Redirect/file/MesaProjectilystSkin.png",
+    source: "https://wiki.warframe.com/w/Mesa_Projectilyst_Skin"
+  },
+  "Mesa/Graxx": {
+    status: "公共资料已核对",
+    verified: true,
+    release: "TennoGen 外观",
+    acquisition: "对应平台 TennoGen 商店",
+    copy: "Graxx 是圣枪弥撒的 TennoGen 外观节点，归入 Graxx 系列视觉语言。平台上架情况以游戏内商店为准。",
+    image: "https://wiki.warframe.com/w/Special:Redirect/file/MesaGraxxSkin.png",
+    source: "https://wiki.warframe.com/w/Mesa_Graxx_Skin"
+  }
+});
+Object.assign(variantTranslations, {
+  Prime: "Prime版",
+  Heirloom: "传家宝",
+  Incarnon: "灵化",
+  Adapter: "适配器",
+  Skin: "外观",
+  Variant: "变体",
+  Form: "形态",
+  Finish: "涂装",
+  Vandal: "破坏者",
+  Kuva: "赤毒",
+  Tenet: "信条",
+  Prisma: "棱晶",
+  Dex: "周年庆",
+  Umbra: "暗影"
+});
+
+function record(name, cn, category, weight, color, aliases, children, meta = {}) {
+  return { name, cn, category, weight, color, aliases, children, meta };
+}
+
+function toNode(item) {
+  return node(item.name, item.category, item.weight, item.color, item.children, {
+    cn: item.cn,
+    aliases: item.aliases,
+    dataStatus: item.meta.dataStatus || "待国服官方复核"
+  });
+}
+
+function node(name, category, weight, color, children, meta = {}) {
+  return { name, category, weight, color, children, ...meta };
 }
 
 function getChineseName(name) {
@@ -174,6 +293,33 @@ function formatName(name) {
 
 function getNameSearchText(name) {
   return [name, getChineseName(name), ...(nameAliases[name] || [])].join(" ").toLowerCase();
+}
+
+function renderDataAudit() {
+  if (!els.dataAudit) return;
+
+  const totalWarframes = warframes.length;
+  const totalSkins = warframes.reduce((sum, item) => sum + item.children.length, 0);
+  const missingCn = warframes.filter((item) => !getChineseName(item.name)).length;
+  const explicitEntries = Object.keys(detailCatalog).length;
+  const pendingEntries = warframes.flatMap((item) => item.children.map((child) => `${item.name}/${child}`))
+    .filter((key) => !detailCatalog[key]).length;
+  const imageReady = warframes.flatMap((item) => item.children.map((child) => detailCatalog[`${item.name}/${child}`]))
+    .filter((entry) => entry?.image || entry?.images?.length).length;
+
+  els.dataAudit.innerHTML = `
+    <div class="audit-title">
+      <span>资料完整度</span>
+      <strong>第一版</strong>
+    </div>
+    <div class="audit-grid">
+      <span><b>${totalWarframes}</b> 战甲</span>
+      <span><b>${totalSkins}</b> 行星</span>
+      <span><b>${explicitEntries}</b> 已细化</span>
+      <span><b>${imageReady}</b> 有图源</span>
+    </div>
+    <p>${pendingEntries} 个节点仍使用自动候选图源；${missingCn} 个战甲缺中文名。国服译名优先，未核对项会保留待复核状态。</p>
+  `;
 }
 
 const canvas = document.querySelector("#galaxy");
@@ -297,6 +443,7 @@ const els = {
   detailRelease: document.querySelector("#detailRelease"),
   detailAcquisition: document.querySelector("#detailAcquisition"),
   detailSource: document.querySelector("#detailSource"),
+  dataAudit: document.querySelector("#dataAudit"),
   warframeCount: document.querySelector("#warframeCount"),
   skinCount: document.querySelector("#skinCount"),
   weaponCount: document.querySelector("#weaponCount")
@@ -306,6 +453,7 @@ els.warframeCount.textContent = warframes.length;
 els.skinCount.textContent = warframes.reduce((sum, item) => sum + item.children.length, 0);
 els.weaponCount.textContent = weapons.length;
 els.searchInput.placeholder = "搜索 圣枪弥撒 / 灰烬之刃 / Mesa";
+renderDataAudit();
 
 const flareTexture = createRadialTexture(["rgba(255,255,255,1)", "rgba(180,220,255,0.42)", "rgba(80,140,255,0)"]);
 const dustTexture = createRadialTexture(["rgba(255,255,255,0.75)", "rgba(170,210,255,0.16)", "rgba(255,255,255,0)"]);
