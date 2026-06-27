@@ -412,8 +412,11 @@ dd {
 .detail-media img {
   z-index: 2;
   display: none;
-  object-fit: cover;
-  object-position: center 24%;
+  object-fit: contain;
+  object-position: center;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255, 229, 164, 0.12), transparent 44%),
+    linear-gradient(135deg, rgba(11, 17, 28, 0.92), rgba(4, 8, 14, 0.98));
 }
 
 .detail-media.has-image img {

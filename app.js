@@ -64,6 +64,8 @@ const warframeRecords = [
   record("Zephyr", "狂啸西风", "air", 10, "#9ee7ff", ["鸟姐"], ["Zephyr Prime", "Harrier", "Hagoromo", "Strafe"])
 ];
 
+const atlasData = await loadAtlasData();
+applyAtlasData(warframeRecords, atlasData);
 const warframes = warframeRecords.map(toNode);
 
 const weapons = [
@@ -264,6 +266,33 @@ function node(name, category, weight, color, children, meta = {}) {
   return { name, category, weight, color, children, ...meta };
 }
 
+async function loadAtlasData() {
+  try {
+    const response = await fetch("./data/warframes.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`Atlas data unavailable: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.warn("Using built-in atlas data", error);
+    return { sourcePriority: [], statusLegend: {}, warframes: [], details: {} };
+  }
+}
+
+function applyAtlasData(records, data) {
+  const byName = new Map(records.map((item) => [item.name, item]));
+
+  for (const patch of data?.warframes || []) {
+    const record = byName.get(patch.name);
+    if (!record) continue;
+
+    if (patch.cn) record.cn = patch.cn;
+    if (Array.isArray(patch.aliases)) record.aliases = patch.aliases;
+    if (patch.status) record.meta = { ...record.meta, dataStatus: patch.status };
+    for (const skin of patch.appendSkins || []) {
+      if (!record.children.includes(skin)) record.children.push(skin);
+    }
+  }
+}
+
 function getChineseName(name) {
   if (nameTranslations[name]) return nameTranslations[name];
 
@@ -301,11 +330,18 @@ function renderDataAudit() {
   const totalWarframes = warframes.length;
   const totalSkins = warframes.reduce((sum, item) => sum + item.children.length, 0);
   const missingCn = warframes.filter((item) => !getChineseName(item.name)).length;
-  const explicitEntries = Object.keys(detailCatalog).length;
+  const externalEntries = Object.keys(atlasData?.details || {}).length;
+  const explicitEntries = Object.keys(detailCatalog).length + externalEntries;
+  const checkedCn = warframes.filter((item) => ["official-cn", "user-confirmed"].includes(item.dataStatus)).length;
   const pendingEntries = warframes.flatMap((item) => item.children.map((child) => `${item.name}/${child}`))
-    .filter((key) => !detailCatalog[key]).length;
+    .filter((key) => !detailCatalog[key] && !atlasData?.details?.[key]).length;
   const imageReady = warframes.flatMap((item) => item.children.map((child) => detailCatalog[`${item.name}/${child}`]))
     .filter((entry) => entry?.image || entry?.images?.length).length;
+  const externalImageReady = Object.values(atlasData?.details || {})
+    .filter((entry) => entry?.image || entry?.images?.length).length;
+  const sourcePriority = atlasData?.sourcePriority?.length
+    ? atlasData.sourcePriority.join(" > ")
+    : "国服官网 > 国际服官网 > Wiki > 手动素材";
 
   els.dataAudit.innerHTML = `
     <div class="audit-title">
@@ -1559,26 +1595,22 @@ function updateDetail(nodeData) {
 
 function getDetailEntry(nodeData, isPlanet) {
   if (!isPlanet) {
-    const compactName = nodeData.name.replaceAll(" ", "");
     return {
       status: "公共资料入口",
       verified: false,
       release: "战甲本体",
       acquisition: "查看对应任务、商店或游戏内说明",
-      images: [`${compactName}.png`, `${compactName}Full.png`].map(wikiImageUrl),
+      images: buildImageCandidates(nodeData.name),
       source: `https://wiki.warframe.com/w/Special:Search?search=${encodeURIComponent(nodeData.name)}`
     };
   }
 
+  const external = getExternalDetailEntry(nodeData);
+  if (external) return external;
+
   const explicit = detailCatalog[`${nodeData.parent}/${nodeData.name}`];
   if (explicit) return explicit;
 
-  const compactName = nodeData.name.replaceAll(" ", "");
-  const compactParent = nodeData.parent.replaceAll(" ", "");
-  const fileStem = nodeData.name.startsWith(nodeData.parent)
-    ? compactName
-    : `${compactParent}${compactName}`;
-  const imageSuffix = nodeData.category === "prime" || nodeData.name.includes("Umbra") ? ".png" : "Skin.png";
   const categoryLabel = {
     prime: "Prime 变体",
     deluxe: "豪华外观",
@@ -1593,17 +1625,94 @@ function getDetailEntry(nodeData, isPlanet) {
     release: categoryLabel,
     acquisition: categoryAcquisition[nodeData.category] || categoryAcquisition.variant,
     copy: `${nodeData.name} 是 ${formatName(nodeData.parent)} 星系中的${categoryLabel}节点。当前已接入公共资料入口，具体国服名称、时间与获取状态仍需逐项核对。`,
-    images: [
-      `${fileStem}${imageSuffix}`,
-      `${compactName}Full.png`,
-      `${fileStem}Full.png`
-    ].map(wikiImageUrl),
+    images: buildImageCandidates(nodeData.name, nodeData.parent, nodeData.category),
     source: `https://wiki.warframe.com/w/Special:Search?search=${encodeURIComponent(`${nodeData.parent} ${nodeData.name}`)}`
   };
 }
 
+function getExternalDetailEntry(nodeData) {
+  const entry = atlasData?.details?.[`${nodeData.parent}/${nodeData.name}`];
+  if (!entry) return null;
+
+  const images = [
+    ...(entry.image ? [entry.image] : []),
+    ...(entry.images || []).flatMap((image) => {
+      const value = typeof image === "string" ? image : image.url || image.fileName || image.file;
+      if (!value) return [];
+      return /^https?:\/\//i.test(value) ? [value] : wikiImageUrls(value);
+    }),
+    ...(entry.imageNames || []).flatMap(wikiImageUrls)
+  ].filter(Boolean);
+  const source = [
+    ...(entry.source ? [entry.source] : []),
+    ...(entry.sources || []).map((item) => typeof item === "string" ? item : item.url)
+  ].find(Boolean) || "";
+
+  return {
+    status: entry.status || "资料待核对",
+    verified: Boolean(entry.verified),
+    release: entry.release || "待补充",
+    acquisition: entry.acquisition || "待补充",
+    copy: entry.copy || "",
+    images: unique(images),
+    source
+  };
+}
+
+function buildImageCandidates(name, parent = "", category = "") {
+  const compactName = compactImageStem(name);
+  const compactParent = compactImageStem(parent);
+  const strippedName = parent && name.toLowerCase().startsWith(`${parent.toLowerCase()} `)
+    ? name.slice(parent.length + 1)
+    : name;
+  const compactStrippedName = compactImageStem(strippedName);
+  const underscoredName = underscoredImageStem(name);
+  const underscoredStrippedName = underscoredImageStem(strippedName);
+  const isPrimeLike = category === "prime" || /\bPrime\b|\bUmbra\b/i.test(name);
+  const isSkinLike = category && !isPrimeLike;
+  const stems = [
+    compactName,
+    compactStrippedName,
+    compactParent && compactStrippedName ? `${compactParent}${compactStrippedName}` : "",
+    underscoredName,
+    underscoredStrippedName,
+    compactParent && compactStrippedName ? `${compactParent}_${underscoredStrippedName}` : ""
+  ].filter(Boolean);
+  const fileNames = [];
+
+  for (const stem of stems) {
+    fileNames.push(`${stem}.png`, `${stem}Full.png`);
+    if (isSkinLike || !/Skin$/i.test(stem)) fileNames.push(`${stem}Skin.png`, `${stem}_Skin.png`);
+    if (category === "heirloom") fileNames.push(`${stem}Heirloom.png`, `${stem}HeirloomSkin.png`, `${stem}_Heirloom_Skin.png`);
+  }
+
+  return unique(fileNames).flatMap(wikiImageUrls);
+}
+
+function compactImageStem(value) {
+  return String(value || "").replace(/[^A-Za-z0-9]/g, "");
+}
+
+function underscoredImageStem(value) {
+  return String(value || "").trim().replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function wikiImageUrls(fileName) {
+  const encoded = encodeURIComponent(fileName);
+  return [
+    `https://wiki.warframe.com/w/Special:Redirect/file/${encoded}`,
+    `https://wiki.warframe.com/w/Special:FilePath/${encoded}`,
+    `https://warframe.fandom.com/wiki/Special:Redirect/file/${encoded}`,
+    `https://warframe.fandom.com/wiki/Special:FilePath/${encoded}`
+  ];
+}
+
 function wikiImageUrl(fileName) {
-  return `https://wiki.warframe.com/w/Special:Redirect/file/${encodeURIComponent(fileName)}`;
+  return wikiImageUrls(fileName)[0];
+}
+
+function unique(items) {
+  return [...new Set(items.filter(Boolean))];
 }
 
 function resetDetailMedia() {
@@ -1633,7 +1742,7 @@ function showDetailMedia(nodeData, entry) {
   els.detailRelease.textContent = detail.release;
   els.detailAcquisition.textContent = detail.acquisition;
 
-  const imageCandidates = detail.images || (detail.image ? [detail.image] : []);
+  const imageCandidates = unique(detail.images || (detail.image ? [detail.image] : []));
   if (imageCandidates.length) {
     let candidateIndex = 0;
     els.detailImage.alt = `${formatName(nodeData.name)} 资料预览`;

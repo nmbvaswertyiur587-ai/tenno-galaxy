@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "updatedAt": "2026-06-27",
+  "sourcePriority": ["国服官网", "国际服官网", "Wiki", "手动素材", "程序生成占位图"],
+  "statusLegend": {
+    "official-cn": "国服官方译名已核对",
+    "user-confirmed": "用户确认，待官方二次核对",
+    "pending": "待核对",
+    "placeholder": "占位资料"
+  },
+  "warframes": [
+    {
+      "name": "Ash",
+      "cn": "灰烬之刃",
+      "aliases": ["灰烬", "忍者甲"],
+      "status": "official-cn"
+    },
+    {
+      "name": "Ember",
+      "cn": "永恒烈焰",
+      "aliases": ["火鸡"],
+      "status": "pending",
+      "appendSkins": ["Ember Heirloom"]
+    },
+    {
+      "name": "Excalibur",
+      "cn": "圣剑",
+      "aliases": ["咖喱", "圣剑哥"],
+      "status": "pending"
+    },
+    {
+      "name": "Gauss",
+      "cn": "高斯",
+      "aliases": ["跑男"],
+      "status": "pending",
+      "appendSkins": ["Altra"]
+    },
+    {
+      "name": "Mesa",
+      "cn": "圣枪弥撒",
+      "aliases": ["圣枪", "弥撒", "女枪", "梅萨"],
+      "status": "official-cn"
+    },
+    {
+      "name": "Rhino",
+      "cn": "犀牛",
+      "aliases": ["牛", "牛甲"],
+      "status": "pending"
+    },
+    {
+      "name": "Valkyr",
+      "cn": "瓦尔基里",
+      "aliases": ["猫女", "狂战甲"],
+      "status": "user-confirmed",
+      "appendSkins": ["Valkyr Heirloom"]
+    },
+    {
+      "name": "Volt",
+      "cn": "伏特",
+      "aliases": ["电男"],
+      "status": "pending"
+    },
+    {
+      "name": "Wisp",
+      "cn": "幽灵",
+      "aliases": ["花妈"],
+      "status": "pending"
+    },
+    {
+      "name": "Zephyr",
+      "cn": "狂啸西风",
+      "aliases": ["鸟姐"],
+      "status": "user-confirmed"
+    }
+  ],
+  "details": {
+    "Ember/Ember Heirloom": {
+      "status": "待官方复核",
+      "verified": false,
+      "release": "传家宝外观",
+      "acquisition": "以官方公告与游戏内商城为准",
+      "copy": "Ember Heirloom 已作为资料库节点补入。上线时间、国服名称与获取方式仍需以官方公告和游戏内商城为准。",
+      "imageNames": ["EmberHeirloomSkin.png", "EmberHeirloom.png", "Ember_Heirloom_Skin.png"],
+      "sources": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Special:Search?search=Ember%20Heirloom"
+        }
+      ]
+    },
+    "Valkyr/Valkyr Heirloom": {
+      "status": "待官方复核",
+      "verified": false,
+      "release": "传家宝外观",
+      "acquisition": "以官方公告与游戏内商城为准",
+      "copy": "Valkyr Heirloom 已作为资料库节点补入。当前按瓦尔基里星系的传家宝外观处理，具体国服资料待复核。",
+      "imageNames": ["ValkyrHeirloomSkin.png", "ValkyrHeirloom.png", "Valkyr_Heirloom_Skin.png"],
+      "sources": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Special:Search?search=Valkyr%20Heirloom"
+        }
+      ]
+    },
+    "Mesa/Mesa Heirloom": {
+      "status": "待官方复核",
+      "verified": false,
+      "release": "传家宝外观",
+      "acquisition": "以官方公告与游戏内商城为准",
+      "copy": "Mesa Heirloom 已接入定向图片候选。具体国服名称、上架时间与获取方式仍以官方公告和游戏内商城为准。",
+      "imageNames": ["MesaHeirloomSkin.png", "MesaHeirloom.png", "Mesa_Heirloom_Skin.png"],
+      "sources": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Special:Search?search=Mesa%20Heirloom"
+        }
+      ]
+    },
+    "Mesa/Mesa Prime": {
+      "status": "公共资料已核对",
+      "verified": true,
+      "release": "2018-12-18（国际服）",
+      "acquisition": "虚空遗物轮换 / Prime Resurgence",
+      "copy": "Mesa Prime 是圣枪弥撒的 Prime 变体。轮换与获取仍以游戏内和官方公告为准。",
+      "images": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Special:Redirect/file/MesaPrime.png"
+        }
+      ],
+      "sources": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Mesa_Prime"
+        }
+      ]
+    },
+    "Mesa/Presidio": {
+      "status": "公共资料待复核",
+      "verified": false,
+      "release": "豪华外观",
+      "acquisition": "游戏内商城 / 对应豪华组合包",
+      "copy": "Presidio 是圣枪弥撒的豪华外观节点，已接入定向图片候选。",
+      "imageNames": ["MesaPresidioSkin.png", "MesaPresidio.png", "Mesa_Presidio_Skin.png"],
+      "sources": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Mesa_Presidio_Skin"
+        }
+      ]
+    },
+    "Mesa/Projectilyst": {
+      "status": "公共资料待复核",
+      "verified": false,
+      "release": "TennoGen 外观",
+      "acquisition": "对应平台 TennoGen 商店",
+      "copy": "Projectilyst 是圣枪弥撒的 TennoGen 外观节点，已接入定向图片候选。",
+      "imageNames": ["MesaProjectilystSkin.png", "MesaProjectilyst.png", "Mesa_Projectilyst_Skin.png"],
+      "sources": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Mesa_Projectilyst_Skin"
+        }
+      ]
+    },
+    "Mesa/Graxx": {
+      "status": "公共资料待复核",
+      "verified": false,
+      "release": "TennoGen 外观",
+      "acquisition": "对应平台 TennoGen 商店",
+      "copy": "Graxx 是圣枪弥撒的 TennoGen 外观节点，已接入定向图片候选。",
+      "imageNames": ["MesaGraxxSkin.png", "MesaGraxx.png", "Mesa_Graxx_Skin.png"],
+      "sources": [
+        {
+          "type": "Wiki",
+          "url": "https://wiki.warframe.com/w/Mesa_Graxx_Skin"
+        }
+      ]
+    }
+  }
+}
