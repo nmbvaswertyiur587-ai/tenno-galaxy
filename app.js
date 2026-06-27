@@ -422,6 +422,7 @@ let warpFlash = null;
 let controlsCollapsed = false;
 let detailCollapsed = false;
 let clickCandidate = null;
+let dragPanState = null;
 const activePointers = new Set();
 
 const els = {
@@ -1716,8 +1717,23 @@ function clearGroup(group) {
 function onPointerDown(event) {
   activePointers.add(event.pointerId);
   clickCandidate = null;
+  dragPanState = null;
   if (event.target.closest("button, input, .panel")) return;
   if (activePointers.size > 1) return;
+
+  if (event.pointerType === "mouse" && event.button === 0) {
+    targetCamera = null;
+    targetLook = null;
+    controls.autoRotate = false;
+    dragPanState = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      lastX: event.clientX,
+      lastY: event.clientY,
+      active: false
+    };
+  }
 
   pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
   pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -1738,14 +1754,26 @@ function onPointerDown(event) {
 }
 
 function onPointerMove(event) {
-  if (!clickCandidate || clickCandidate.pointerId !== event.pointerId) return;
-  const distance = Math.hypot(event.clientX - clickCandidate.x, event.clientY - clickCandidate.y);
-  if (distance > 8) clickCandidate.moved = true;
+  if (dragPanState?.pointerId === event.pointerId) {
+    const totalDistance = Math.hypot(event.clientX - dragPanState.startX, event.clientY - dragPanState.startY);
+    if (totalDistance > 4) dragPanState.active = true;
+    if (dragPanState.active) {
+      applyDragPan(event.clientX - dragPanState.lastX, event.clientY - dragPanState.lastY);
+      dragPanState.lastX = event.clientX;
+      dragPanState.lastY = event.clientY;
+    }
+  }
+
+  if (clickCandidate?.pointerId === event.pointerId) {
+    const distance = Math.hypot(event.clientX - clickCandidate.x, event.clientY - clickCandidate.y);
+    if (distance > 8) clickCandidate.moved = true;
+  }
 }
 
 function onPointerUp(event) {
   const wasMultiTouch = activePointers.size > 1;
   activePointers.delete(event.pointerId);
+  if (dragPanState?.pointerId === event.pointerId) dragPanState = null;
   if (!clickCandidate || clickCandidate.pointerId !== event.pointerId) return;
 
   const candidate = clickCandidate;
@@ -1760,7 +1788,23 @@ function onPointerUp(event) {
 
 function onPointerCancel(event) {
   activePointers.delete(event.pointerId);
+  if (dragPanState?.pointerId === event.pointerId) dragPanState = null;
   if (clickCandidate?.pointerId === event.pointerId) clickCandidate = null;
+}
+
+function applyDragPan(deltaX, deltaY) {
+  if (!deltaX && !deltaY) return;
+
+  const distance = camera.position.distanceTo(controls.target);
+  const panScale = THREE.MathUtils.clamp(distance * 0.00135, 0.035, 0.18);
+  const cameraRight = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0);
+  const cameraUp = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1);
+  const offset = cameraRight
+    .multiplyScalar(-deltaX * panScale)
+    .add(cameraUp.multiplyScalar(deltaY * panScale));
+
+  camera.position.add(offset);
+  controls.target.add(offset);
 }
 
 function onWheel(event) {
@@ -2139,6 +2183,7 @@ window.addEventListener("pointercancel", onPointerCancel);
 window.addEventListener("blur", () => {
   activePointers.clear();
   clickCandidate = null;
+  dragPanState = null;
 });
 window.addEventListener("wheel", onWheel, { passive: false, capture: true });
 window.addEventListener("resize", () => {
